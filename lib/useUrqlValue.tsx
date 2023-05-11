@@ -14,8 +14,8 @@ export function useUrqlValue(operationKey: number, value?: { data: any, error: a
       rehydrationContext.operationValuesByKey[operationKey] = value;
     }
   } else {
-    const urqlTransport = window[urqlTransportSymbol as any];
-    const store = (urqlTransport && urqlTransport[0] as unknown as { rehydrate: Record<string, { data: any, error: any }> })
+    const stores = (window[urqlTransportSymbol as any] || []) as unknown as Array<{ rehydrate: Record<number, { data: any, error: any }>}>;
+    const store = stores.find(x => x && x.rehydrate && x.rehydrate[operationKey])
     if (store) {
       const result = store.rehydrate && store.rehydrate[operationKey];
       if (result) {

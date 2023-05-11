@@ -28,7 +28,6 @@ function wrap(
       transported[key] = result[key];
     }
   
-    console.log(request.key, transported)
     useUrqlValue(request.key, transported)
 
     return [result, execute];
