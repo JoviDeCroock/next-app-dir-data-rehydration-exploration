@@ -5,36 +5,26 @@ import {
   cacheExchange,
   fetchExchange,
   ssrExchange,
-  Provider
+  Provider,
+  debugExchange
 } from "urql";
-import { ServerInsertedHTMLContext } from "next/navigation";
+import { RehydrationContextProvider } from "./RehydrationContext";
 
-const ssr = ssrExchange();
+export const ssr = ssrExchange();
 const client = createClient({
   url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
-  exchanges: [cacheExchange, ssr, fetchExchange],
+  exchanges: [cacheExchange, debugExchange, ssr, fetchExchange],
   suspense: true
 });
 
 export function Wrapper({ children }: React.PropsWithChildren) {
-  const insertHtml = React.useContext(ServerInsertedHTMLContext);
-
-  if (typeof window !== 'undefined') {
-    // When we enter the client we want to restore
-    // the ssr-exchange with the contents
-    // of this else branch.
-  } else {
-    // when we are on the server and we flush
-    // and/or are done rendering we need to call
-    // insertHtml with a script tag containing
-    // the output of ssr.extractData()
-  }
-
   return (
     <Provider
       value={client}
     >
+      <RehydrationContextProvider>
       {children}
+      </RehydrationContextProvider>
     </Provider>
   );
 }
