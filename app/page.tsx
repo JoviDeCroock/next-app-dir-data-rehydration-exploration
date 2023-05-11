@@ -1,7 +1,16 @@
 import Link from 'next/link';
-import { gql } from '@urql/core';
+import { cacheExchange, createClient, fetchExchange, gql } from '@urql/core';
 
-import { getCachedClient } from './Data'
+import { registerUrql } from '../lib/rsc'
+
+const makeClient = () => {
+  return createClient({
+      url: 'https://trygql.formidable.dev/graphql/basic-pokedex',
+      exchanges: [cacheExchange, fetchExchange]
+  })
+}
+
+const { getClient } = registerUrql(makeClient)
 
 const PokemonsQuery = gql`
   query {
@@ -10,12 +19,12 @@ const PokemonsQuery = gql`
 `;
 
 export default async function Home() {
-  const result = await getCachedClient().query(PokemonsQuery, {})
+  const result = await getClient().query(PokemonsQuery, {})
   return (
     <main>
       <h1>This is rendered as part of an RSC</h1>
       <ul>
-        {result.data.pokemons.map(x => <li key={x.id}>{x.name}</li>)}
+        {result.data.pokemons.map((x: any) => <li key={x.id}>{x.name}</li>)}
       </ul>
       <Link href="/non-rsc">
         Non RSC
