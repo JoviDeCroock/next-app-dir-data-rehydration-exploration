@@ -1,9 +1,11 @@
 "use client";
+
 import {
-    createRequest,
+  UseQueryArgs,
+  createRequest,
   useQuery as orig_useQuery,
 } from "urql";
-import { useTransportValue } from "./useTransportValue";
+import { useUrqlValue } from "./useUrqlValue";
 
 export const useQuery = wrap(orig_useQuery, [
   "data",
@@ -11,18 +13,24 @@ export const useQuery = wrap(orig_useQuery, [
 ]);
 
 function wrap(
-  useFn: any,
-  transportKeys: any[]
-): any {
-  return ((...args: any[]) => {
-    const request = createRequest(args[0].query, args[0].variables || {});
-    useTransportValue(request.key)
-    const [result, execute] = useFn(...args);
+  useFn: typeof orig_useQuery,
+  transportKeys: string[]
+): typeof orig_useQuery {
+  return ((queryArgs: UseQueryArgs) => {
+    const request = createRequest(queryArgs.query, queryArgs.variables || {});
+    useUrqlValue(request.key)
+  
+    const [result, execute] = useFn(queryArgs);
+  
     const transported: any = {};
     for (const key of transportKeys) {
+      // @ts-ignore
       transported[key] = result[key];
     }
-    useTransportValue(request.key, transported)
+  
+    console.log(request.key, transported)
+    useUrqlValue(request.key, transported)
+
     return [result, execute];
-  }) as any;
+  }) as typeof orig_useQuery;
 }

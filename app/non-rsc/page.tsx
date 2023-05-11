@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { gql } from "urql";
+
 import { useQuery } from "../../lib/hooks";
 
 export default function Page() {

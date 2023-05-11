@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   createClient,
@@ -8,7 +9,7 @@ import {
   Provider,
   debugExchange
 } from "urql";
-import { RehydrationContextProvider } from "./RehydrationContext";
+import { DataHydrationContextProvider } from "./DataHydrationContext";
 
 export const ssr = ssrExchange();
 const client = createClient({
@@ -22,9 +23,9 @@ export function Wrapper({ children }: React.PropsWithChildren) {
     <Provider
       value={client}
     >
-      <RehydrationContextProvider>
-      {children}
-      </RehydrationContextProvider>
+      <DataHydrationContextProvider>
+        {children}
+      </DataHydrationContextProvider>
     </Provider>
   );
 }
